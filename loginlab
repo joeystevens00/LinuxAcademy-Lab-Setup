@@ -1,0 +1,8 @@
+#!/bin/bash
+user="$1"
+servername="$2"
+labPassDir="labauth"
+password=`cat $labPassDir/$user`
+
+serverIp=$(grep "$servername" $labPassDir/servers | cut -d " " -f1)
+sshpass -p"$password" ssh $user@$serverIp 

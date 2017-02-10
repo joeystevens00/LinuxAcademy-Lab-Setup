@@ -1,0 +1,58 @@
+#!/usr/bin/expect -f
+# wrapper to make passwd(1) be non-interactive
+# username is passed as 1st arg, passwd as 2nd
+
+set username [lindex $argv 0]
+set password [lindex $argv 1]
+set serverid [lindex $argv 2]
+set newpassword [lindex $argv 3]
+set newrootpassword [lindex $argv 4]
+set newusername [lindex $argv 5]
+set newuserpassword [lindex $argv 6]
+
+spawn ssh $serverid
+expect "$serverid's password:"
+send "$password\r"
+expect "UNIX password:"
+send "$password\r"
+expect "New password:"
+send "$newpassword\r"
+expect "Retype new password:"
+send "$newpassword\r"
+
+spawn ssh $serverid
+expect "$serverid's password:"
+send "$newpassword\r"
+expect "$ "
+send "su\r"
+expect "Password:"
+send "$password\r"
+expect "UNIX password:"
+send "$password\r"
+expect "New password:"
+send "$newrootpassword\r"
+expect "Retype new password:"
+send "$newrootpassword\r"
+
+spawn ssh $serverid
+expect "$serverid's password:"
+send "$newpassword\r"
+expect "$ "
+send "su\r"
+expect "Password:"
+send "$newrootpassword\r"
+expect "# "
+send "useradd $newusername\r"
+expect "# "
+send "passwd $newusername\r"
+expect "New password:"
+send "$newuserpassword\r"
+expect "Retype new password:"
+send "$newuserpassword\r"
+expect "# "
+send "cd \r"
+expect "# "
+send "userdel -rf user\r"
+expect eof
+
+
