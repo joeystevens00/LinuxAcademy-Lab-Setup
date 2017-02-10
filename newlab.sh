@@ -8,10 +8,14 @@ function executeOnServer() {
 	sshpass -p"$pass" ssh $user@$ip "$cmd"
 }
 
+function randomPassword() {
+	cat /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c "$1"
+}
+
 function genPasswords() {
-	pass_user=`passwordgen.sh -l=10`
-	pass_root=`passwordgen.sh -l=10`
-	pass_newuser=`passwordgen.sh -l=10`
+	pass_user=`randomPassword 10`
+	pass_root=`randomPassword 10`
+	pass_newuser=`randomPassword 10`
 	echo "$pass_user" > $labPassDir/user.tmp
 	echo "$pass_root" > $labPassDir/root
 	echo "$pass_newuser" > $labPassDir/$user
