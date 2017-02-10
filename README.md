@@ -1,5 +1,5 @@
 ### LinuxAcademy Lab Setup
-These scripts automate the first steps that must be executed for every new LinuxAcademy lab which are:    
+These scripts automate the first steps that must be executed for every new LinuxAcademy lab server which are:    
 - Login with the default user
 - Change the default user's password
 - Login as root
