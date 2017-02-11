@@ -64,7 +64,7 @@ function waitForServer() {
 	while [[ `isServerUp` -eq 1 ]]; do
 		newtime=`date +%s`  
 		echo -ne "Waiting for server... $((newtime-stopwatch))\r"
-		sleep 1
+		sleep 5
 	done
 	echo -e "\nLooks like server is up"
 }
