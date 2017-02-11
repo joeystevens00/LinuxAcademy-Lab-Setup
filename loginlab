@@ -5,8 +5,7 @@ labPassDir="$HOME/.labauth"
 password=`cat $labPassDir/$user`
 
 serverIp=$(grep "$servername" $labPassDir/servers | cut -d " " -f1)
-ssh-keygen -R "$serverIp"
-ssh-keyscan -H "$serverIp" >> ~/.ssh/known_hosts
-
+ssh-keygen -R "$serverIp" > /dev/null 2> /dev/null
+ssh-keyscan -H "$serverIp" >> ~/.ssh/known_hosts 2> /dev/null
 
 sshpass -p"$password" ssh $user@$serverIp 
