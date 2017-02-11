@@ -10,6 +10,7 @@ set newrootpassword [lindex $argv 4]
 set newusername [lindex $argv 5]
 set newuserpassword [lindex $argv 6]
 
+# Login as the user and change the password when prompted by passwd
 spawn ssh $serverid
 expect "$serverid's password:"
 send "$password\r"
@@ -20,6 +21,7 @@ send "$newpassword\r"
 expect "Retype new password:"
 send "$newpassword\r"
 
+# Login as the user and then su and change the password when prompted by passwd
 spawn ssh $serverid
 expect "$serverid's password:"
 send "$newpassword\r"
@@ -34,6 +36,7 @@ send "$newrootpassword\r"
 expect "Retype new password:"
 send "$newrootpassword\r"
 
+# Login as the user, su, then create our new user, and delete the default user
 spawn ssh $serverid
 expect "$serverid's password:"
 send "$newpassword\r"
@@ -52,7 +55,7 @@ send "$newuserpassword\r"
 expect "# "
 send "cd \r"
 expect "# "
-send "userdel -rf user\r"
+send "userdel -rf user\r" # -f is used here as a dirty way to not have to login as the new user now
 expect eof
 
 
