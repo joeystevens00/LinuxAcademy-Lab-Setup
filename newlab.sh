@@ -32,8 +32,9 @@ function setServerName() {
 function testThatUserWasCreated() {
 	testLogin=`executeOnServer "$ip" "$user" "$pass_newuser" "whoami"`
 	if [[ $testLogin == "$user" ]]; then 
-			echo "1"
-			#echo "$ip $servername" >> $labPassDir/servers
+			echo $?
+	else
+		echo $?
 	fi
 }
 
@@ -52,17 +53,20 @@ function setupEnv() {
 function isServerUp() {
 	resp=`nmap -p22 "$ip" 2> /dev/null | grep open`
 	if [ -n "$resp" ]; then
-		echo '1'
+		echo $?
+	else
+		echo $?
 	fi
 }
 
 function waitForServer() {
 	stopwatch=`date +%s`
-	while [[ `isServerUp` -ne 1 ]]; do
+	while [[ `isServerUp` -eq 1 ]]; do
 		newtime=`date +%s`  
 		echo -ne "Waiting for server... $((newtime-stopwatch))\r"
 		sleep 1
 	done
+	echo -e "\nLooks like server is up"
 }
 
 function newlab() {
@@ -77,7 +81,7 @@ function newlab() {
 	echo "root: $pass_root"
 	echo "$user: $pass_newuser"
 	echo "Checking if user was successfully created..."
-	if [[ `testThatUserWasCreated` -eq 1 ]]; then 
+	if [[ `testThatUserWasCreated` -eq 0 ]]; then 
 		echo "User successfully created"
 		setServerName
 	else
