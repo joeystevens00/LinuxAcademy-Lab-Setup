@@ -18,6 +18,7 @@ Then login by passing the username and nickname to loginlab
 ### Requirements
 expect   
 sshpass   
+nmap
 
 ### Warnings
 These scripts are inherently insecure and shouldn't be used for any non-dev servers. There are serious risks involved with passing passwords as command line arguments (passwords are exposed by ps) as well as storing passwords in flatfiles. 
