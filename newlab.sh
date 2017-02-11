@@ -28,7 +28,7 @@ function genPasswords() {
 ip="$1"
 user="$2"
 servername="$3"
-labPassDir="labauth"
+labPassDir="$HOME/.labauth"
 
 if [ -z "$servername" ]; then servername="server01"; fi
 if [ ! -d "$labPassDir" ]; then mkdir "$labPassDir"; fi 
@@ -38,7 +38,7 @@ genPasswords
 ./login-and-change-passwd.exp "user" "123456" "user@$ip" "$pass_user" \
 							"$pass_root" "$user" "$pass_newuser"
 testLogin=`executeOnServer "$ip" "$user" "$pass_newuser" "whoami"`
-echo "\n\n Checking if user was successfully created..."
+echo -e "\n\n Checking if user was successfully created..."
 
 if [[ $testLogin == "$user" ]]; then 
 		echo "User successfully created"
