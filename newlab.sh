@@ -49,8 +49,25 @@ function setupEnv() {
 	ssh-keyscan -H "$ip" >> ~/.ssh/known_hosts 2> /dev/null
 }
 
+function isServerUp() {
+	resp=`nmap -p22 "$ip" 2> /dev/null | grep open`
+	if [ -n "$resp" ]; then
+		echo '1'
+	fi
+}
+
+function waitForServer() {
+	stopwatch=`date +%s`
+	while [[ `isServerUp` -ne 1 ]]; do
+		newtime=`date +%s`  
+		echo -ne "Waiting for server... $((newtime-stopwatch))\r"
+		sleep 1
+	done
+}
+
 function newlab() {
 	setupEnv "$@"
+	waitForServer
 	genPasswords
 	echo "Starting the script"
 	./login-and-change-passwd.exp \
