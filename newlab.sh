@@ -29,22 +29,25 @@ ip="$1"
 user="$2"
 servername="$3"
 labPassDir="$HOME/.labauth"
+errorFile="$labPassDir/errors.log"
 
 if [ -z "$servername" ]; then servername="server01"; fi
 if [ ! -d "$labPassDir" ]; then mkdir "$labPassDir"; fi 
-ssh-keygen -R "$ip"
-ssh-keyscan -H "$ip" >> ~/.ssh/known_hosts
+ssh-keygen -R "$ip" > /dev/null 2> /dev/null
+ssh-keyscan -H "$ip" >> ~/.ssh/known_hosts 2> /dev/null
 genPasswords
-./login-and-change-passwd.exp "user" "123456" "user@$ip" "$pass_user" \
-							"$pass_root" "$user" "$pass_newuser"
+echo "Starting the script"
+./login-and-change-passwd.exp \
+	"user" "123456" "user@$ip" "$pass_user" \
+	"$pass_root" "$user" "$pass_newuser" > /dev/null 2> $errorFile
 testLogin=`executeOnServer "$ip" "$user" "$pass_newuser" "whoami"`
-echo -e "\n\n Checking if user was successfully created..."
+echo "Checking if user was successfully created..."
 
 if [[ $testLogin == "$user" ]]; then 
 		echo "User successfully created"
 		echo "$ip $servername" >> $labPassDir/servers
 else
-		echo "Failed!"
+		echo "Failed! Perhaps check the error file: $errorFile"
 fi
 
 
