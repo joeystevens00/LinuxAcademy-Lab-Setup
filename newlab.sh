@@ -19,35 +19,53 @@ function genPasswords() {
 	echo "$pass_user" > $labPassDir/user.tmp
 	echo "$pass_root" > $labPassDir/root
 	echo "$pass_newuser" > $labPassDir/$user
-
-	echo "user: $pass_user"
-	echo "root: $pass_root"
-	echo "$user: $pass_newuser"
 }
 
-ip="$1"
-user="$2"
-servername="$3"
-labPassDir="$HOME/.labauth"
-errorFile="$labPassDir/errors.log"
+function setServerName() {
+	if [ -z "$servername" ]; then servername="default"; fi
+	serverfile=`cat $labPassDir/servers` 2> /dev/null
+	serverfile=`echo -e "$serverfile" | grep -v " $servername$"` # Overwrites server name if it exists
+	serverfile=`echo -e "$serverfile\n$ip $servername"`
+	echo -e "$serverfile" > $labPassDir/servers 
+}
 
-if [ -z "$servername" ]; then servername="server01"; fi
-if [ ! -d "$labPassDir" ]; then mkdir "$labPassDir"; fi 
-ssh-keygen -R "$ip" > /dev/null 2> /dev/null
-ssh-keyscan -H "$ip" >> ~/.ssh/known_hosts 2> /dev/null
-genPasswords
-echo "Starting the script"
-./login-and-change-passwd.exp \
-	"user" "123456" "user@$ip" "$pass_user" \
-	"$pass_root" "$user" "$pass_newuser" > /dev/null 2> $errorFile
-testLogin=`executeOnServer "$ip" "$user" "$pass_newuser" "whoami"`
-echo "Checking if user was successfully created..."
+function testThatUserWasCreated() {
+	testLogin=`executeOnServer "$ip" "$user" "$pass_newuser" "whoami"`
+	if [[ $testLogin == "$user" ]]; then 
+			echo "1"
+			#echo "$ip $servername" >> $labPassDir/servers
+	fi
+}
 
-if [[ $testLogin == "$user" ]]; then 
+function setupEnv() {
+	ip="$1"
+	user="$2"
+	servername="$3"
+	labPassDir="$HOME/.labauth"
+	errorFile="$labPassDir/errors.log"
+	if [ ! -d "$labPassDir" ]; then mkdir "$labPassDir"; fi 
+
+	ssh-keygen -R "$ip" > /dev/null 2> /dev/null
+	ssh-keyscan -H "$ip" >> ~/.ssh/known_hosts 2> /dev/null
+}
+
+function newlab() {
+	setupEnv "$@"
+	genPasswords
+	echo "Starting the script"
+	./login-and-change-passwd.exp \
+		"user" "123456" "user@$ip" "$pass_user" \
+		"$pass_root" "$user" "$pass_newuser" > /dev/null 2> $errorFile
+
+	echo "root: $pass_root"
+	echo "$user: $pass_newuser"
+	echo "Checking if user was successfully created..."
+	if [[ `testThatUserWasCreated` -eq 1 ]]; then 
 		echo "User successfully created"
-		echo "$ip $servername" >> $labPassDir/servers
-else
+		setServerName
+	else
 		echo "Failed! Perhaps check the error file: $errorFile"
-fi
+	fi
+}
 
-
+newlab "$@"
