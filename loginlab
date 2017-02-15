@@ -2,7 +2,7 @@
 user="$1"
 servername="$2"
 labPassDir="$HOME/.labauth"
-password=`cat $labPassDir/$user`
+password=`cat $labPassDir/$servername-$user`
 
 serverIp=$(grep "$servername" $labPassDir/servers | cut -d " " -f1)
 ssh-keygen -R "$serverIp" > /dev/null 2> /dev/null
