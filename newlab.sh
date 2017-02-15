@@ -66,6 +66,9 @@ function waitForServer() {
 		echo -ne "Waiting for server... $((newtime-stopwatch))\r"
 		sleep 5
 	done
+	until [[ -n "`executeOnServer $ip user 123456 2> /dev/null`" ]]; do
+		sleep 5
+	done
 	echo -e "\nLooks like server is up"
 }
 
