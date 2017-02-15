@@ -66,8 +66,12 @@ function waitForServer() {
 		echo -ne "Waiting for server... $((newtime-stopwatch))\r"
 		sleep 5
 	done
-	until [[ -n "`executeOnServer $ip user 123456 2> /dev/null`" ]]; do
-		sleep 5
+	export -f executeOnServer
+	until ((exitStatus==124)); do # timeout will return exit status of 124 on failure because of timeout but 255 on failure because of hostname not found
+		echo "Checking that the service is responding to our SSH request"  # This will at least tell us that the server is up and responding to SSH requests
+		noTTYConnection=`timeout 3 bash -c "executeOnServer $ip user 123456 2> /dev/null"`
+		exitStatus=$?
+		sleep 1
 	done
 	echo -e "\nLooks like server is up"
 }
@@ -79,7 +83,7 @@ function newlab() {
 	echo "Starting the script"
 	./login-and-change-passwd.exp \
 		"user" "123456" "user@$ip" "$pass_user" \
-		"$pass_root" "$user" "$pass_newuser" > /dev/null 2> $errorFile
+		"$pass_root" "$user" "$pass_newuser"  > /dev/null 2> $errorFile
 
 	echo "root: $pass_root"
 	echo "$user: $pass_newuser"
