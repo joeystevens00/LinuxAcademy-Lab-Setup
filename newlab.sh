@@ -16,9 +16,9 @@ function genPasswords() {
 	pass_user=`randomPassword 10`
 	pass_root=`randomPassword 10`
 	pass_newuser=`randomPassword 10`
-	echo "$pass_user" > $labPassDir/user.tmp
-	echo "$pass_root" > $labPassDir/root
-	echo "$pass_newuser" > $labPassDir/$user
+	echo "$pass_user" > "$labPassDir/$servername-user.tmp"
+	echo "$pass_root" > "$labPassDir/$servername-root"
+	echo "$pass_newuser" > "$labPassDir/$servername-$user"
 }
 
 function setServerName() {
